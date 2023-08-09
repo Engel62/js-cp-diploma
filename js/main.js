@@ -37,13 +37,13 @@ function updateCalendar() {
     });
 }
 
-// Формирует запрос на сервер и приводит к обновлению разметки html
+
 function updateData() {
-    // Формируем запрос на сервер (Передаем: 1. строка тела запроса, 2. строка с именем источника запроса для инфо в консоли, 3. какая функция будет вызвана после ответа сервера )
+
     createRequest("event=update", "MAIN", updateHtmlMain);
 };
 
-// Обновляет html и вызывает addListeners()
+
 function updateHtmlMain(serverResponse) {
     const response = JSON.parse(serverResponse);
 
@@ -51,16 +51,14 @@ function updateHtmlMain(serverResponse) {
     const arrHalls = response.halls.result.filter((item) => item.hall_open !== "0");
     const arrSeances = response.seances.result;
 
-    // Сохраним конфигурацию залов в объект для sessionStorage
+
     const configHalls = {};
 
-    // Наполнение страницы
 
-    // timestamp выбранного дня
     const selectedDayTimeStamp = (document.querySelector("nav .page-nav__day_chosen")).dataset.dayTimeStamp;
     const nowTimeStamp = Date.now();
 
-    // Секция film
+
     const mainSection = document.querySelector("main");
     mainSection.innerHTML = "";
 
@@ -84,7 +82,7 @@ function updateHtmlMain(serverResponse) {
        `;
         mainSection.insertAdjacentHTML("beforeend", textHtml);
 
-        // Секция hall
+
         const movieSection = mainSection?.querySelector(".movie:last-child");
 
         arrHalls.forEach(elementHall => {
@@ -94,7 +92,7 @@ function updateHtmlMain(serverResponse) {
             const arrSeancesCurrentFilmAndHall = arrSeances.filter((seance, index, array) => {
                 return seance.seance_filmid === elementFilm.film_id && seance.seance_hallid === elementHall.hall_id;
             });
-            // Имя зала приходит с сервера почему-то в виде: "Зал2" (склееная строка, не цифра, не строка + цифра)
+
             const hallNameText = `${elementHall.hall_name.slice(0, 3)} ${elementHall.hall_name.slice(3).trim()}`;
 
             if (arrSeancesCurrentFilmAndHall.length) {
@@ -107,13 +105,12 @@ function updateHtmlMain(serverResponse) {
            `;
                 movieSection.insertAdjacentHTML("beforeend", textHtml);
 
-                // Секция seances
+
                 const mooviSeancesList = movieSection?.querySelector(".movie-seances__hall:last-child > .movie-seances__list");
 
                 arrSeancesCurrentFilmAndHall.forEach(elementSeance => {
                     const seanceTimeStamp = +selectedDayTimeStamp + (+elementSeance.seance_start * 60 * 1000);
 
-                    // Если сеанс еще не начался:
                     if (nowTimeStamp < seanceTimeStamp) {
                         const textHtml = `
                  <li class="movie-seances__time-block"><a class="movie-seances__time" href="hall.html" data-film-id=${elementFilm.film_id} data-film-name="${elementFilm.film_name}" data-hall-id=${elementHall.hall_id} data-hall-name="${hallNameText}" data-price-vip=${elementHall.hall_price_vip} data-price-standart=${elementHall.hall_price_standart} data-seance-id=${elementSeance.seance_id} data-seance-time=${elementSeance.seance_time} data-seance-start=${elementSeance.seance_start} data-seance-time-stamp=${seanceTimeStamp}>${elementSeance.seance_time}</a></li>
@@ -125,13 +122,13 @@ function updateHtmlMain(serverResponse) {
         });
     });
 
-    // Запишем данные залов в SessionStorage через JSON
+
     setJSON("config-halls", configHalls);
 
     addListeners();
 }
 
-// Обработчик клика в шапке на выбранной дате
+
 function onDayClick(event) {
     event.preventDefault();
     const pageNavDay = document.querySelectorAll(".page-nav__day");
@@ -144,7 +141,7 @@ function onDayClick(event) {
     updateData();
 }
 
-// Обработчик Клика по сеансу
+
 function onSeanceClick(event) {
     const seanceData = this.dataset;
 
@@ -152,13 +149,13 @@ function onSeanceClick(event) {
 }
 
 function addListeners() {
-    // Клик в шапке на выбранной дате
+
     const pageNavDay = document.querySelectorAll(".page-nav__day");
     pageNavDay.forEach(element => {
         element.addEventListener("click", onDayClick);
     });
 
-    // Клик по сеансу
+
     const movieSeancesTime = document.querySelectorAll(".movie-seances__time");
     movieSeancesTime.forEach(element => {
         element.addEventListener("click", onSeanceClick);
